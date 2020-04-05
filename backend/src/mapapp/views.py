@@ -17,6 +17,7 @@ class MapViewSet(viewsets.ModelViewSet):
     serializer_class = MapSerializer
 
 
+import json
 # API
 @csrf_exempt
 def map_list(request):
@@ -28,11 +29,11 @@ def map_list(request):
 
     # Add one
     if request.method == 'POST':
-        map_data = JSONParser().parser(request)
+        map_data = JSONParser().parse(request)
         maps_serializer = MapSerializer(data=map_data)
         if maps_serializer.is_valid():
             maps_serializer.save()
-            return JsonResponse(map_data.data, status=status.HTTP_201_CREATED)
+            return JsonResponse(maps_serializer.data, status=status.HTTP_201_CREATED)
         return JsonResponse(maps_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Delete list
