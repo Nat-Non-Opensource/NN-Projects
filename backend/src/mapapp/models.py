@@ -10,6 +10,7 @@ CATEGORY = (
 
 
 class Map(models.Model):
+    id = models.IntegerField(primary_key=True, help_text='Primary Key')
     place_name = models.CharField("Place Name", max_length=100)
     place_categories = models.CharField(
         "Place Categories", max_length=11, choices=CATEGORY)
