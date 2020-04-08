@@ -54,7 +54,7 @@
 
 - Pull from Google sheets to Database SQLite3
 
-- Add a Completely Sidebar --- 68%
+- Add a Completely Sidebar --- 50%
 
 - Make a multiple map types
 
