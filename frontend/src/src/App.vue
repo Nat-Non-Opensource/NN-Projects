@@ -167,22 +167,6 @@
 			url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 		},
 	];
-	menus = [
-		// Header items
-		{
-			header: true,
-			title: 'Chiang Mai Maps',
-			hidden: false,
-			hiddenOnCollapse: true,
-			class: '',
-			attributes: {},
-		},
-
-		// Item
-		{
-			title: 'ตำแหน่งที่ถูกเลือกจะถูกแสดงข้อมูลตรงนี้',
-		},
-	];
 
 	export default {
 		name: 'App',
@@ -258,7 +242,22 @@
 				imperial: false,
 				tileProviders: tileProviders,
 				markers: [],
-				menu: menus,
+				menu: [
+					// Header items
+					{
+						header: true,
+						title: 'Chiang Mai Maps',
+						hidden: false,
+						hiddenOnCollapse: true,
+						class: '',
+						attributes: {},
+					},
+
+					// Item
+					{
+						title: 'ตำแหน่งที่ถูกเลือกจะถูกแสดงข้อมูลตรงนี้',
+					},
+				],
 				covid191: [
 					{
 						id: 's1',
@@ -308,47 +307,6 @@
 		methods: {
 			alert(item) {
 				alert('this is ' + JSON.stringify(item));
-			},
-			showSidebar(
-				pname,
-				pdesciption,
-				platitude
-				// plongitude,
-				// pimage,
-				// penable,
-				// pcategory
-			) {
-				menus = [
-					{
-						header: true,
-						title: 'Chiang Mai Maps',
-						hidden: false,
-						hiddenOnCollapse: true,
-						class: '',
-						attributes: {},
-					},
-
-					// Item
-					{
-						title: 'ชื่อสถานที: ',
-					},
-					{
-						title: pname,
-					},
-					{
-						title: 'คำอธิบาย: ',
-					},
-
-					{
-						title: pdesciption,
-					},
-					{
-						title: 'ตำแหน่ง: ',
-					},
-					{
-						title: 'ละติจูด: ' + platitude,
-					},
-				];
 			},
 		},
 		computed: {
