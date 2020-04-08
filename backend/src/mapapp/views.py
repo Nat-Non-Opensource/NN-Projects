@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse
 from .models import Map
 from .serializers import MapSerializer
@@ -17,7 +18,6 @@ class MapViewSet(viewsets.ModelViewSet):
     serializer_class = MapSerializer
 
 
-import json
 # API
 @csrf_exempt
 def map_list(request):
