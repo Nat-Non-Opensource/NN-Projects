@@ -13,7 +13,8 @@
 			</tr>
 		</table> -->
 	<!-- Map -->
-	<div style="width: 100%; height: 100%;">
+	<div style="width: 100%; height: 100%;" class="noScroll">
+		<sidebar-menu :menu="menu" />
 		<l-map
 			:zoom.sync="zoom"
 			:options="mapOptions"
@@ -53,15 +54,15 @@
 				:icon="marker.icon"
 				@click="alert(marker)"
 			>
-				<l-popup :content="marker.tooltip" />
 				<l-tooltip :content="marker.tooltip" />
+				<l-popup :content="marker.tooltip" />
 			</l-marker>
 			<l-layer-group
-				v-for="item in stuff1"
+				v-for="item in covid191"
 				:key="item.id"
 				:visible.sync="item.visible"
 				layer-type="overlay"
-				name="COVID-19"
+				name="COVID-19: บริการ"
 			>
 				<l-layer-group :visible="item.markersVisible">
 					<l-marker
@@ -72,19 +73,50 @@
 						:lat-lng="marker.position"
 						:icon="iconCovid"
 						@click="alert(marker)"
+						><l-tooltip :content="marker.tooltip"
+					/></l-marker>
+				</l-layer-group>
+			</l-layer-group>
+			<!-- <l-layer-group
+				v-for="items in covid190"
+				:key="items.id"
+				:visible.sync="item.visible"
+				name="COVID-19: ไม่บริการ"
+			>
+				<l-layer-group :visible="item.markersVisible">
+					<l-marker
+						v-for="marker in items.markers"
+						:key="marker.id"
+						:visible="item.visible"
+						:draggable="item.draggable"
+						:lat-lng="marker.position"
+						:icon="iconCovids"
+						@click="alert(marker)"
 					/>
-					<!-- <l-icon
-							:icon-size="dynamicSize"
-							:icon-anchor="dynamicAnchor"
-							icon-url="./assets/leaf-red.png"
-							icon-s
-						/> -->
-					<!-- </l-marker> -->
+				</l-layer-group>
+			</l-layer-group> -->
+			<l-layer-group
+				v-for="item in covid190"
+				:key="item.id"
+				:visible.sync="item.visible"
+				layer-type="overlay"
+				name="COVID-19: ไม่บริการ"
+			>
+				<l-layer-group :visible="item.markersVisible">
+					<l-marker
+						v-for="marker in item.markers"
+						:key="marker.id"
+						:visible="item.visible"
+						:draggable="item.draggable"
+						:lat-lng="marker.position"
+						:icon="iconCovids"
+						@click="alert(marker)"
+					/>
 				</l-layer-group>
 			</l-layer-group>
 
 			<l-layer-group
-				v-for="item in stuff2"
+				v-for="item in rescueFlags"
 				:key="item.id"
 				:visible.sync="item.visible"
 				layer-type="overlay"
@@ -107,6 +139,7 @@
 
 <script>
 	import { latLngBounds, icon } from 'leaflet';
+	import { SidebarMenu } from 'vue-sidebar-menu';
 	import {
 		LMap,
 		LTileLayer,
@@ -114,7 +147,6 @@
 		LLayerGroup,
 		LTooltip,
 		LPopup,
-		// LIcon,
 		LControlZoom,
 		LControlAttribution,
 		LControlScale,
@@ -122,17 +154,33 @@
 	} from 'vue2-leaflet';
 	import axios from 'axios';
 
-	const markers1 = [];
-	const markers2 = [];
+	const markersCovid1 = [];
+	const markersCovid0 = [];
+	const markersRescue = [];
 
 	const tileProviders = [
 		{
 			name: 'OpenStreetMap',
 			visible: true,
-			// attribution:
-			// '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+			attribution:
+				'&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 			url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-			// url: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png',
+		},
+	];
+	menus = [
+		// Header items
+		{
+			header: true,
+			title: 'Chiang Mai Maps',
+			hidden: false,
+			hiddenOnCollapse: true,
+			class: '',
+			attributes: {},
+		},
+
+		// Item
+		{
+			title: 'ตำแหน่งที่ถูกเลือกจะถูกแสดงข้อมูลตรงนี้',
 		},
 	];
 
@@ -149,23 +197,43 @@
 			LControlAttribution,
 			LControlScale,
 			LControlLayers,
+			SidebarMenu,
 		},
 		mounted() {
 			axios.get('http://127.0.0.1:39112/map/').then((response) => {
 				for (const item of response.data) {
-					markers1.push({
-						position: { lat: item.place_latitude, lng: item.place_longitude },
-						tooltip: item.place_name,
-						visible: true,
-						draggable: false,
-					});
+					if (item.place_categories == 'covid19') {
+						if (item.place_enable == true) {
+							markersCovid1.push({
+								position: {
+									lat: item.place_latitude,
+									lng: item.place_longitude,
+								},
+								tooltip: item.place_name,
+								visible: true,
+								draggable: false,
+							});
+						} else {
+							markersCovid0.push({
+								position: {
+									lat: item.place_latitude,
+									lng: item.place_longitude,
+								},
+								tooltip: item.place_name,
+								visible: true,
+								draggable: false,
+							});
+						}
+					}
 
-					markers2.push({
-						position: { lat: item.place_latitude, lng: item.place_longitude },
-						tooltip: item.place_name,
-						visible: true,
-						draggable: false,
-					});
+					if (item.place_categories == 'rescue') {
+						markersRescue.push({
+							position: { lat: item.place_latitude, lng: item.place_longitude },
+							tooltip: item.place_name,
+							visible: true,
+							draggable: false,
+						});
+					}
 				}
 			});
 		},
@@ -180,42 +248,52 @@
 					zoomSnap: true,
 				},
 				zoom: 13,
-				minZoom: 1,
-				maxZoom: 21,
-				zoomPosition: 'topleft',
+				minZoom: 0.5,
+				maxZoom: 19,
+				zoomPosition: 'topright',
 				attributionPosition: 'bottomright',
 				layersPosition: 'topright',
 				attributionPrefix: 'Vue2Leaflet',
 				Positions: ['topleft', 'topright', 'bottomleft', 'bottomright'],
 				imperial: false,
 				tileProviders: tileProviders,
-				markers: [
-					// {
-					// 	id: 'm1',
-					// 	position: { lat: 18.7888595, lng: 98.9846145 },
-					// 	tooltip: 'Mueang Chiang Mai',
-					// 	draggable: true,
-					// 	visible: true,
-					// },
-				],
-				stuff1: [
+				markers: [],
+				menu: menus,
+				covid191: [
 					{
 						id: 's1',
-						markers: markers1,
+						markers: markersCovid1,
 						visible: true,
 						markersVisible: true,
 					},
 				],
-				stuff2: [
+				covid190: [
 					{
 						id: 's2',
-						markers: markers2,
+						markers: markersCovid0,
+						visible: true,
+						markersVisible: true,
+					},
+				],
+				rescueFlags: [
+					{
+						id: 's3',
+						markers: markersRescue,
 						visible: true,
 						markersVisible: true,
 					},
 				],
 				iconCovid: icon({
 					iconUrl: require('./assets/leaf-red.png'),
+					shadowUrl: require('./assets/leaf-shadow.png'),
+					iconSize: [38, 95],
+					shadowSize: [50, 64],
+					iconAnchor: [22, 94],
+					shadowAnchor: [4, 62],
+					popupAnchor: [-3, -76],
+				}),
+				iconCovids: icon({
+					iconUrl: require('./assets/leaf-gray.png'),
 					shadowUrl: require('./assets/leaf-shadow.png'),
 					iconSize: [38, 95],
 					shadowSize: [50, 64],
@@ -230,8 +308,48 @@
 		methods: {
 			alert(item) {
 				alert('this is ' + JSON.stringify(item));
-			},	
-			getting() {},
+			},
+			showSidebar(
+				pname,
+				pdesciption,
+				platitude
+				// plongitude,
+				// pimage,
+				// penable,
+				// pcategory
+			) {
+				menus = [
+					{
+						header: true,
+						title: 'Chiang Mai Maps',
+						hidden: false,
+						hiddenOnCollapse: true,
+						class: '',
+						attributes: {},
+					},
+
+					// Item
+					{
+						title: 'ชื่อสถานที: ',
+					},
+					{
+						title: pname,
+					},
+					{
+						title: 'คำอธิบาย: ',
+					},
+
+					{
+						title: pdesciption,
+					},
+					{
+						title: 'ตำแหน่ง: ',
+					},
+					{
+						title: 'ละติจูด: ' + platitude,
+					},
+				];
+			},
 		},
 		computed: {
 			dynamicSize() {
@@ -275,5 +393,10 @@
 		text-align: left;
 		background-color: #4caf50;
 		color: white;
+	}
+
+	.noScroll {
+		overflow-x: none;
+		overflow-y: none;
 	}
 </style>

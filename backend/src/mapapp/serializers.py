@@ -5,4 +5,5 @@ from rest_framework import serializers
 class MapSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Map
-        fields = ('place_name', 'place_description', 'place_latitude', 'place_longitude')
+        fields = ('place_name', 'place_description', 'place_latitude',
+                  'place_longitude', 'place_categories', 'place_enable')
