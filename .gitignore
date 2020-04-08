@@ -60,3 +60,6 @@ Thumbs.db
 *.swp
 
 # Temporary unwant
+
+static
+dist
