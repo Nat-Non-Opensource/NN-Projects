@@ -1,18 +1,4 @@
 <template>
-	<!-- Toggle tables -->
-	<!-- <table>
-			<tr>
-				<th>Layer</th>
-				<th>Visible</th>
-			</tr>
-			<tr v-for="(item, index) in stuff" :key="index">
-				<td>{{ 'Layer ' + (index + 1) }}</td>
-				<td style="text-align: center;">
-					<input v-model="item.visible" type="checkbox" />
-				</td>
-			</tr>
-		</table> -->
-	<!-- Map -->
 	<div style="width: 100%; height: 100%;" class="noScroll">
 		<sidebar-menu :menu="menu" />
 		<l-map
@@ -34,9 +20,8 @@
 				:key="tileProvider.name"
 				:name="tileProvider.name"
 				:visible="tileProvider.visible"
-				:url="tileProvider.url"
 				:attribution="tileProvider.attribution"
-				:token="token"
+				:url="tileProvider.url"
 				layer-type="base"
 			/>
 			<l-control-zoom :position="zoomPosition" />
@@ -72,29 +57,20 @@
 						:draggable="marker.draggable"
 						:lat-lng="marker.position"
 						:icon="iconCovid"
-						@click="alert(marker)"
+						@click="
+							showSidebar(
+								marker.tooltip,
+								marker.active,
+								marker.type,
+								marker.desc,
+								marker.position.lat,
+								marker.position.lng
+							)
+						"
 						><l-tooltip :content="marker.tooltip"
 					/></l-marker>
 				</l-layer-group>
 			</l-layer-group>
-			<!-- <l-layer-group
-				v-for="items in covid190"
-				:key="items.id"
-				:visible.sync="item.visible"
-				name="COVID-19: ไม่บริการ"
-			>
-				<l-layer-group :visible="item.markersVisible">
-					<l-marker
-						v-for="marker in items.markers"
-						:key="marker.id"
-						:visible="item.visible"
-						:draggable="item.draggable"
-						:lat-lng="marker.position"
-						:icon="iconCovids"
-						@click="alert(marker)"
-					/>
-				</l-layer-group>
-			</l-layer-group> -->
 			<l-layer-group
 				v-for="item in covid190"
 				:key="item.id"
@@ -110,11 +86,19 @@
 						:draggable="item.draggable"
 						:lat-lng="marker.position"
 						:icon="iconCovids"
-						@click="alert(marker)"
+						@click="
+							showSidebar(
+								marker.tooltip,
+								marker.active,
+								marker.type,
+								marker.desc,
+								marker.position.lat,
+								marker.position.lng
+							)
+						"
 					/>
 				</l-layer-group>
 			</l-layer-group>
-
 			<l-layer-group
 				v-for="item in rescueFlags"
 				:key="item.id"
@@ -129,7 +113,16 @@
 						:visible="marker.visible"
 						:draggable="marker.draggable"
 						:lat-lng="marker.position"
-						@click="alert(marker)"
+						@click="
+							showSidebar(
+								marker.tooltip,
+								marker.active,
+								marker.type,
+								marker.desc,
+								marker.position.lat,
+								marker.position.lng
+							)
+						"
 					/>
 				</l-layer-group>
 			</l-layer-group>
@@ -138,6 +131,7 @@
 </template>
 
 <script>
+	import Vue from 'vue';
 	import { latLngBounds, icon } from 'leaflet';
 	import { SidebarMenu } from 'vue-sidebar-menu';
 	import {
@@ -160,13 +154,30 @@
 
 	const tileProviders = [
 		{
-			name: 'OpenStreetMap',
+			name: 'Open Street Map (Carto)',
 			visible: true,
+			attribution:
+				'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a>',
+			url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+		},
+		{
+			name: 'Open Street Map (Default)',
+			visible: false,
 			attribution:
 				'&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 			url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 		},
+		{
+			name: 'Open Street Map (Gray)',
+			visible: false,
+			attribution:
+				'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			url:
+				'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/{z}/{x}/{y}?access_token=sk.eyJ1IjoicGF3YXQiLCJhIjoiY2s4cjBoMDM5MDUwMzNmcW45ZHd0YWppMyJ9.mEct1P_2b2sLI_5MBrpkRA',
+		},
 	];
+
+	let places_enable = '';
 
 	export default {
 		name: 'App',
@@ -194,6 +205,9 @@
 									lng: item.place_longitude,
 								},
 								tooltip: item.place_name,
+								desc: item.place_description,
+								types: item.place_categories,
+								active: item.place_enable,
 								visible: true,
 								draggable: false,
 							});
@@ -204,16 +218,23 @@
 									lng: item.place_longitude,
 								},
 								tooltip: item.place_name,
+								desc: item.place_description,
+								types: item.place_categories,
+								active: item.place_enable,
 								visible: true,
 								draggable: false,
 							});
 						}
-					}
-
-					if (item.place_categories == 'rescue') {
+					} else if (item.place_categories == 'rescue') {
 						markersRescue.push({
-							position: { lat: item.place_latitude, lng: item.place_longitude },
+							position: {
+								lat: item.place_latitude,
+								lng: item.place_longitude,
+							},
 							tooltip: item.place_name,
+							desc: item.place_description,
+							types: item.place_categories,
+							active: item.place_enable,
 							visible: true,
 							draggable: false,
 						});
@@ -225,7 +246,8 @@
 			return {
 				center: [18.7888595, 98.9846145],
 				opacity: 0.6,
-				token: 'your token if using mapbox',
+				tokens:
+					'sk.eyJ1IjoicGF3YXQiLCJhIjoiY2s4cjBoMDM5MDUwMzNmcW45ZHd0YWppMyJ9.mEct1P_2b2sLI_5MBrpkRA',
 				mapOptions: {
 					zoomControl: false,
 					attributionControl: false,
@@ -305,15 +327,96 @@
 		},
 
 		methods: {
-			alert(item) {
-				alert('this is ' + JSON.stringify(item));
+			// alert(item) {
+			// 	alert('this is ' + JSON.stringify(item));
+			// },
+			showSidebar(
+				place_name,
+				place_enable,
+				place_categories,
+				place_descriptions,
+				place_latitude,
+				place_longitude
+				// place_image
+			) {
+				if (place_enable == 0) {
+					places_enable = 'ไม่บริการ';
+				} else if (place_enable == 1) {
+					places_enable = 'บริการ';
+				}
+
+				if (place_categories == 'covid19') {
+					place_categories == 'COVID-19: โรงทานน้ำใจ';
+				} else if (place_categories == 'rescue') {
+					place_categories == 'Rescue: กู้ภัย';
+				} else if (place_categories == 'er-hospital') {
+					place_categories == 'ER-Hospital: ห้องฉุกเฉิน';
+				} else if (place_categories == 'aed') {
+					place_categories == 'AED: เครื่องปั้มหัวใจ';
+				}
+
+				console.log(place_descriptions);
+
+				Vue.set(this.menu, 0, {
+					header: true,
+					title: place_name,
+					hidden: false,
+					hiddenOnCollapse: true,
+					class: '',
+					attributes: {},
+				});
+				Vue.set(this.menu, 1, {
+					title: 'ชื่อสถานที่: ' + place_name,
+					hidden: false,
+					hiddenOnCollapse: true,
+				});
+				Vue.set(this.menu, 2, {
+					title: 'คำอธิบาย:',
+					hidden: false,
+					hiddenOnCollapse: true,
+				});
+				Vue.set(this.menu, 3, {
+					title: place_descriptions,
+					hidden: false,
+					hiddenOnCollapse: true,
+				});
+				Vue.set(this.menu, 4, {
+					title: 'สถานที่ให้บริการ: ' + places_enable,
+					hidden: false,
+					hiddenOnCollapse: true,
+				});
+				Vue.set(this.menu, 5, {
+					title: 'สถานที่ประเภท: ' + place_categories,
+					hidden: false,
+					hiddenOnCollapse: true,
+				});
+				Vue.set(this.menu, 6, {
+					title: 'ตำแหน่งสถานที่:\n',
+					hidden: false,
+					hiddenOnCollapse: true,
+				});
+				Vue.set(this.menu, 7, {
+					title: 'ละติจูด: ' + place_latitude,
+					hidden: false,
+					hiddenOnCollapse: true,
+				});
+				Vue.set(this.menu, 8, {
+					title: 'ลองจิจูด: ' + place_longitude,
+					hidden: false,
+					hiddenOnCollapse: true,
+				});
+				Vue.set(this.menu, 9, {
+					title: 'รูปภาพ:\n',
+					hidden: false,
+					hiddenOnCollapse: true,
+				});
 			},
 		},
 		computed: {
 			dynamicSize() {
 				return [this.iconSize, this.iconSize * 1.15];
 			},
-			dynamicAnchor() {
+			dynamicAnchor() {	
 				return [this.iconSize / 2, this.iconSize * 1.15];
 			},
 		},
