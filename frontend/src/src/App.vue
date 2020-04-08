@@ -195,7 +195,7 @@
 			SidebarMenu,
 		},
 		mounted() {
-			axios.get('http://127.0.0.1:39112/map/').then((response) => {
+			axios.get('/map/').then((response) => {
 				for (const item of response.data) {
 					if (item.place_categories == 'covid19') {
 						if (item.place_enable == true) {
@@ -416,7 +416,7 @@
 			dynamicSize() {
 				return [this.iconSize, this.iconSize * 1.15];
 			},
-			dynamicAnchor() {	
+			dynamicAnchor() {
 				return [this.iconSize / 2, this.iconSize * 1.15];
 			},
 		},
