@@ -24,7 +24,7 @@ SECRET_KEY = 'zxzox4c7s7ez_hjoru(rsh=lun9y*ff%0^silsycy#bpjakop5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['natnon.humanist.cc']
 
 # Application definition
 
