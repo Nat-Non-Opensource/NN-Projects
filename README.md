@@ -10,13 +10,11 @@
 
 ---
 
-- How to create a Projects
+- Create a Projects
 
-- How to create and Apps
+- Create and Apps
 
 - Installing Django REST Framework
-
-- How to use Django REST Framework
 
 - Config and Testing API Endpoint
 
@@ -40,7 +38,7 @@
 
 - Renovate directories
 
-- Change JS framework from AngularJS to VueJS
+- Change JS framework from AngularJS to VueJS (Angular -> Nuxt -> Vue)
 
 ## Frontend (VueJS):
 
