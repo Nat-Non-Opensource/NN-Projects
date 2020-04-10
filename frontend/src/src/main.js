@@ -3,10 +3,6 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
-import VueSidebarMenu from 'vue-sidebar-menu';
-import 'vue-sidebar-menu/dist/vue-sidebar-menu.css';
-
-Vue.use(VueSidebarMenu);
 
 Vue.config.productionTip = false;
 
