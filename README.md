@@ -32,6 +32,8 @@
 
 - Adding Cross-Origin Resource Sharing (CORS) Headers
 
+- Prepare models and serializer with images --- 32%
+
 ## Misc:
 
 ---
@@ -59,6 +61,8 @@
 - Make a multiple map types
 
 - Make a Dialog when press the location
+
+- Insert data to dialog --- 65%
 
 ## Frontend (Angular - Tutorials):
 
