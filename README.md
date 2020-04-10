@@ -54,9 +54,11 @@
 
 - Pull from Google sheets to Database SQLite3
 
-- Add a Completely Sidebar --- 68%
+- Add a Completely Sidebar --- 68% ------ Canceled
 
 - Make a multiple map types
+
+- Make a Dialog when press the location
 
 ## Frontend (Angular - Tutorials):
 
