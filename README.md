@@ -30,7 +30,7 @@
 
 - Adding Cross-Origin Resource Sharing (CORS) Headers
 
-- Prepare models and serializer with images --- 32%
+- Prepare models and serializer with images --- 50%
 
 ## Misc:
 
