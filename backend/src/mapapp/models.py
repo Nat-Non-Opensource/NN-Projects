@@ -33,7 +33,7 @@ class Map(models.Model):
         return str(self.place_name)
 
 
-# class Map_Image(models.Model):
-#     property = models.ForeignKey(
-#         Map, related_name='images', on_delete=models.CASCADE)
-#     place_image = models.ImageField("Place Image", blank=True)
+class Map_Image(models.Model):
+    property = models.ForeignKey(
+        Map, related_name='images', on_delete=models.CASCADE)
+    place_image = models.ImageField("Place Image", blank=True, upload_to='images/')
