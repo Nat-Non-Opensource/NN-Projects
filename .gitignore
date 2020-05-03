@@ -385,6 +385,7 @@ tags
 .vim
 
 ### VisualStudioCode ###
+*.code-workspace
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -398,4 +399,3 @@ tags
 # End of https://www.gitignore.io/api/visualstudiocode,vim,venv,sublimetext,python,node,macos,jupyternotebooks,emacs,executable
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
-
